@@ -6,6 +6,7 @@ import operator
 INF = Decimal(9999999999999999999999999999999999)
 k = int(sys.argv[2])
 
+
 def dist(p1, p2):
 	return (Decimal(p1[0])-Decimal(p2[0]))**Decimal(2) + (Decimal(p1[1])-Decimal(p2[1]))**Decimal(2)
 
