@@ -8,7 +8,7 @@ k_min = 0
 k_max = 0
 INF = 9999999999999
 ncluster = "ncluster"
-ll = 0
+LENMAT = 0
 
 
 def dist(p1, p2):
@@ -16,10 +16,10 @@ def dist(p1, p2):
 
 
 def cDistMatrix(data):
-    l = len(data)
-    distMatrix = [[0 for x in range(l)] for y in range(l)]
-    for i in range(l):
-        for j in range(i, l):
+    ldata = len(data)
+    distMatrix = [[0 for x in range(ldata)] for y in range(ldata)]
+    for i in range(ldata):
+        for j in range(i, ldata):
             distMatrix[i][j] = dist(data[labelDic[i]][0], data[labelDic[j]][0])
             distMatrix[j][i] = distMatrix[i][j]
     return distMatrix
@@ -38,13 +38,15 @@ def max(i, j):
 
 
 def singleLink(distMatrix, cluster, data, distList):
-	l = len(distMatrix[0])
-	ll = l
+	lmat = len(distMatrix[0])
+	LENMAT = lmat
 	while(cluster[ncluster] >= k_min):
 		print(cluster[ncluster])
-		menor = INF
-		menorLabel = [0, 0]
+		#menor = INF
+		#menorLabel = [0, 0]
+		print(len(distList)) #aqui entra
 		for n in range(0, len(distList) - 1):
+			print('Entrou') #não tá entrando aqui
 			auxzao1 = list(distList[n].values()).copy()
 			i = auxzao1[0][0]
 			j = auxzao1[0][1]
@@ -100,27 +102,28 @@ def main():
 
 	distMatrix = cDistMatrix(data)
 	distList = []
-	for i in range(ll):
-		for j in range(i, ll):
+	for i in range(0, LENMAT):
+		for j in range(i, LENMAT):
             # Dic que guarda Distancia e ids i e j
 			noAtual = {}
 			noAtual[distMatrix[i][j]] = [i, j]
-			distList.append(noAtual)        
+			distList.append(noAtual.copy)        
 	# Criar lista de distancias
 	# ordenar lista de distancias
+	print(len(distList))
 
 	listAux = distList.copy()
 	orderedDist = []
 	valueUpdater = []
-	for i in range(ll):
-		for j in range(i, ll):
-			orderedDist.append(distMatrix[i][j])
+	for i in range(LENMAT): #era pra tar printando isso, aqui é uma lista com todas as distancias
+		for j in range(i, LENMAT):
+			orderedDist.append(float(distMatrix[i][j]))
+	print(f'Ordered dist = {len(orderedDist)}')
+	orderedDist.sort()#Ordena ela
 	
-	orderedDist.sort()
-	
-	for cont in range(0, len(orderedDist) - 1):
+	for cont in range(0, len(orderedDist) - 1): #treco pra inverter
 		for cont2 in range(0, len(listAux) - 1):
-			auxzao = list(listAux[cont2].keys()).copy()
+			auxzao = list(listAux[cont2].keys()).copy() #Usando a lista de distancia ordenada, se não for igual, substitui por ela
 			if orderedDist[cont] == auxzao[0][0]:
 				valueUpdater = list(listAux[cont2].values()).copy()
 		distList[cont].update({orderedDist[cont]: valueUpdater[0]})
