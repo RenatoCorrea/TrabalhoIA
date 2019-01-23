@@ -8,67 +8,77 @@ k_min = 0
 k_max = 0
 INF = 9999999999999
 ncluster = "ncluster"
+ll = 0
+
 
 def dist(p1, p2):
-	return (float(p1[0])-float(p2[0]))**float(2) + (float(p1[1])-float(p2[1]))**float(2)
+    return (float(p1[0])-float(p2[0]))**float(2) + (float(p1[1])-float(p2[1]))**float(2)
+
 
 def cDistMatrix(data):
-	l = len(data)
-	distMatrix = [[0 for x in range(l)] for y in range(l)]
-	for i in range(l):
-		for j in range(i, l):
-			distMatrix[i][j] = dist(data[labelDic[i]][0], data[labelDic[j]][0])
-			distMatrix[j][i] = distMatrix[i][j]
-	return distMatrix
+    l = len(data)
+    distMatrix = [[0 for x in range(l)] for y in range(l)]
+    for i in range(l):
+        for j in range(i, l):
+            distMatrix[i][j] = dist(data[labelDic[i]][0], data[labelDic[j]][0])
+            distMatrix[j][i] = distMatrix[i][j]
+    return distMatrix
 
 
 def min(i, j):
-	if(i < j):
-		return i
-	return j
+    if(i < j):
+        return i
+    return j
+
 
 def max(i, j):
-	if(i > j):
-		return i
-	return j
+    if(i > j):
+        return i
+    return j
 
 
-def singleLink(distMatrix, cluster, data):
+def singleLink(distMatrix, cluster, data, distList):
 	l = len(distMatrix[0])
+	ll = l
 	while(cluster[ncluster] >= k_min):
-		print cluster[ncluster]
+		print(cluster[ncluster])
 		menor = INF
 		menorLabel = [0, 0]
-		for n in range(l):#for in range(len(distList))
-			# "distancia": [i, j]
-			#adapta os id dentro da lista pra i e j nos campos abaixo
-			# i = n[1][0]
-			# j = n[1][1]
+		for n in range(0, len(distList) - 1):
+			auxzao1 = list(distList[n].values()).copy()
+			i = auxzao1[0][0]
+			j = auxzao1[0][1]
+            # for in range(len(distList))
+            # "distancia": [i, j]
+            # adapta os id dentro da lista pra i e j nos campos abaixo
+            # i = n[1][0]
+            # j = n[1][1]
 			novo = min(data[labelDic[i]][1], data[labelDic[j]][1])
 			velho = max(data[labelDic[i]][1], data[labelDic[j]][1])
-			# Lembrando que 'data' esta estruturado como:
-			#	"label": [[d1, d2], clusterId]
+            # Lembrando que 'data' esta estruturado como:
+            #	"label": [[d1, d2], clusterId]
 			for s in cluster[velho]:
 				cluster[novo].append(s)
-				data[s][1] = novo 
+				data[s][1] = novo
 			cluster[velho].clear()
-			#cluster[ncluster] mantem o numero atual de clusters
+            # cluster[ncluster] mantem o numero atual de clusters
 			cluster[ncluster] -= 1
 
 			if(cluster[ncluster] <= k_max):
 				with open(sys.argv[1][:-4] + str(cluster[ncluster]) + ".clu", "w") as fp:
 					for x in data:
-						# print(x + "	" + str(cluster[x]))
+                        # print(x + "	" + str(cluster[x]))
 						fp.write(x[0] + "	" + str(x[2]) + "\n")
+		# vtnc pytao
 
 
 # sigle-link.py file k_min k_max
 
 def main():
-	
+
 	data = {}
 	cluster = {}
-	cluster[ncluster] = 0;
+	cluster[ncluster] = 0
 	k_min = sys.argv[2]
 	k_max = sys.argv[3]
 
@@ -90,15 +100,33 @@ def main():
 
 	distMatrix = cDistMatrix(data)
 	distList = []
-	for i in range(l):
-		for j in range(i, l):
-			#Dic que guarda Distancia e ids i e j
+	for i in range(ll):
+		for j in range(i, ll):
+            # Dic que guarda Distancia e ids i e j
 			noAtual = {}
 			noAtual[distMatrix[i][j]] = [i, j]
-			distList
-			#Criar lista de distancias 
-	#ordenar lista de distancias
-	singleLink(distMatrix, cluster, data)
+			distList.append(noAtual)        
+	# Criar lista de distancias
+	# ordenar lista de distancias
+
+	listAux = distList.copy()
+	orderedDist = []
+	valueUpdater = []
+	for i in range(ll):
+		for j in range(i, ll):
+			orderedDist.append(distMatrix[i][j])
+	
+	orderedDist.sort()
+	
+	for cont in range(0, len(orderedDist) - 1):
+		for cont2 in range(0, len(listAux) - 1):
+			auxzao = list(listAux[cont2].keys()).copy()
+			if orderedDist[cont] == auxzao[0][0]:
+				valueUpdater = list(listAux[cont2].values()).copy()
+		distList[cont].update({orderedDist[cont]: valueUpdater[0]})
+
+	singleLink(distMatrix, cluster, data, distList)
+
 
 if __name__ == "__main__":
     main()
